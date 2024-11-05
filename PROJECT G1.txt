@@ -1,0 +1,141 @@
+Python Code:::
+
+#Connector for connecting MYSql with Python | Time function for timing our prints and outputs
+import mysql.connector
+import time
+#connecting to the database
+dbconn = mysql.connector.connect(
+    host="localhost",
+    user="root",
+    password="",
+    database="space",
+    auth_plugin = "mysql_native_password"
+)
+#Function to add a Plant
+def add_planet(dbconn, planet_data):
+    cursor = dbconn.cursor()
+    sql = "INSERT INTO spacetable (Planets, Parent_Star, Planetary_system, Galaxy, Habitability, Temperature, Type_surface, Nof_moon, Distance) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
+    cursor.execute(sql, planet_data)
+    dbconn.commit()
+    cursor.close()
+#Function to Edit a planet Information
+def edit_planet(dbconn, planet_name, new_data):
+    cursor = dbconn.cursor()
+    sql = "UPDATE spacetable SET Parent_Star = %s, Planetary_system = %s, Galaxy = %s, Habitability = %s, Temperature = %s, Type_surface = %s, Nof_moon = %s, Distance = %s WHERE Planets = %s"
+    cursor.execute(sql, (*new_data, planet_name))
+    dbconn.commit()
+    cursor.close()
+#fuction to delete a planet
+def delete_planet(dbconn, planet_name):
+    cursor = dbconn.cursor()
+    sql = "DELETE FROM spacetable WHERE Planets = %s"
+    cursor.execute(sql, (planet_name,))
+    dbconn.commit()
+    cursor.close()
+#Function to delete a planet
+def display_planets(dbconn):
+    cursor = dbconn.cursor()
+    cursor.execute("SELECT * FROM spacetable")
+    for row in cursor:
+        print(row)
+    cursor.close()
+#Menu Driven Program
+print("Welcome to Space Base. Here, the currently known planets and dwarf planets are in this database.Enter (y) to our data!")
+time.sleep(2)
+mer = input("Enter y/n:")
+if mer == "y":
+    display_planets(dbconn)
+else:
+    print("Looks like you are intrigued to get into the program")
+time.sleep(2)
+print("Let get into our program then!!")
+ch = "y"
+while ch == 'y':
+    print("1.ADD\n")
+    print("2.EDIT\n")
+    print("3.DELETE\n")
+    print("4.DISPLAY\n")
+    karma = int(input("Enter your choice(1,2,3,4):"))
+    #Code after the USER chooses the choice
+    try:
+        if karma == 1:
+            Planets = input("Enter New Planet Name:")
+            Parent_Star = input("Enter the Parent Star Name:")
+            Planetary_system = input("Enter the Planetary System Name:")
+            Galaxy = input("Enter the Galaxy name Name:")
+            Habitability = input("Is the Planet Habitable?(yes/no):")
+            Temperature = int(input("Enter its Temperature(Average):"))
+            Type_surface = input("Enter The planet Surface type(rocky/ice/etc...):")
+            Nof_moon = int(input("Enter the number of moons of this planet:"))
+            Distance = int(input("Enter the distance of this planet from Earth:"))
+            data = [Planets, Parent_Star, Planetary_system, Galaxy, Habitability, Temperature, Type_surface, Nof_moon,
+                    Distance]
+            add_planet(dbconn, data)
+            display_planets(dbconn)
+            
+        elif karma == 2:
+            Planets = input("Enter Planet for data Editing:")
+            print("Enter the new values to be edited")
+            Parent_Star = input("Enter Parent star name:")
+            Planetary_system = input("Enter Planetary System name:")
+            Galaxy = input("Enter Galaxy Name:")
+            Habitability = input("If it is habitable or not(yes/no):")
+            Temperature = int(input("Enter Temperature(Average):"))
+            Type_surface = input("Enter the Planet surface type:" )
+            Nof_moon = int(input("Enter number of moons:"))
+            Distance = int(input("Enter distance of planet from Earth:"))
+            data = [Parent_Star,Planetary_system,Galaxy,Habitability,Temperature,Type_surface,Nof_moon,Distance]
+            edit_planet(dbconn, Planets, data)
+            display_planets(dbconn)
+
+        elif karma == 3:
+            planet = input("Enter the Planet to be deleted:")
+            delete_planet(dbconn, planet)
+            
+        elif karma == 4:
+            display_planets(dbconn)
+        else:
+            print("Your choice is out of range", karma)
+    #To denote if the code has been successful
+    finally:
+        print("Processing!!")
+        time.sleep(2)
+        print("Set Done!!")
+    #To denote if the USER wants to continue the program
+    time.sleep(2)
+    ch = input("Would You like to continue?(y/n):")
+    #The Code when User wants to exit the program
+    if ch == "n":
+        time.sleep(2)
+        print("See You Soon!!")
+
+SQL code:::
+
+CREATE DATABASE SPACE;
+USE SPACE;
+CREATE TABLE SPACETABLE
+(
+Planets VARCHAR(50) PRIMARY KEY,
+Parent_Star VARCHAR(100),
+Planetary_system VARCHAR(50),
+Galaxy VARCHAR(50),
+Habitability VARCHAR(50),
+Temperature VARCHAR(100),
+Type_surface VARCHAR(50),
+Nof_moon INT,
+Distance FLOAT);
+
+INSERT INTO SPACETABLE (Planets, Parent_Star, Planetary_system, Galaxy, Habitability, Temperature, Type_surface, Nof_moon, Distance)
+VALUES ("Mercury","Sun","Solar System","Milky Way","NO",167,"Rocky","0","77"),
+("Venus","Sun","Solar System","Milky Way","NO",464,"Rocky","0","41"),
+("Earth","Sun","Solar System","Milky Way","YES",15,"Rocky","1","0"),
+("Mars","Sun","Solar System","Milky Way","NO",-65,"Rocky","2","78"),
+("Jupiter","Sun","Solar System","Milky Way","NO",-110,"Gas Giant","95","788"),
+("Saturn","Sun","Solar System","Milky Way","NO",-220,"Gas Giant","146","1427"),
+("Uranus","Sun","Solar System","Milky Way","NO",-195,"Ice Giant","27","2872"),
+("Neptune","Sun","Solar System","Milky Way","NO",-200,"Ice Giant","14","4498"),
+("Pluto","Sun","Solar System","Milky Way","NO",-225,"Icy Dwarf Planet","5","5913"),
+("Ceres","Sun","Asteroid Belt","Milky Way","NO",-78,"Rocky Dwarf Planet","0","414"),
+("Eris","Sun","Kuiper Belt","Milky Way","NO",-212,"Icy Dwarf Planet","1","10100"),
+("Haumea","Sun","Kuiper Belt","Milky Way","NO",-200,"Icy Dwarf Planet","2","6480"),
+("Makemake","Sun","Kuiper Belt","Milky Way","NO",-200,"Icy Dwarf Planet","1","6850");
